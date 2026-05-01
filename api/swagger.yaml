@@ -1,0 +1,33 @@
+openapi: 3.0.0
+info:
+  title: Secure-IoT Warehouse API
+  description: API для интеграции системы мониторинга склада с WMS и обработки событий от датчиков.
+  version: 1.0.0
+
+paths:
+  /sensors/telemetry:
+    post:
+      summary: Отправка данных с датчика
+      description: Эндпоинт для приема данных (температура, влажность) после валидации в MQTT-брокере.
+      responses:
+        '202':
+          description: Данные приняты и поставлены в очередь на анализ.
+        '401':
+          description: Ошибка авторизации (невалидный токен/сертификат).
+
+  /alerts/critical:
+    get:
+      summary: Получение списка критических инцидентов
+      description: Используется WMS-системой для получения алармов (вскрытие, пожар).
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: {type: string}
+                    type: {type: string, example: "unauthorized_access"}
+                    timestamp: {type: string, format: date-time}
