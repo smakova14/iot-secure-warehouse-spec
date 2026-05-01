@@ -1,26 +1,17 @@
 openapi: 3.0.0
 info:
   title: Secure-IoT Warehouse API
-  description: API для интеграции системы мониторинга склада с WMS и обработки событий от датчиков.
+  description: Спецификация API для интеграции системы мониторинга с WMS и обработки инцидентов ИБ.
   version: 1.0.0
 
 paths:
-  /sensors/telemetry:
-    post:
-      summary: Отправка данных с датчика
-      description: Эндпоинт для приема данных (температура, влажность) после валидации в MQTT-брокере.
-      responses:
-        '202':
-          description: Данные приняты и поставлены в очередь на анализ.
-        '401':
-          description: Ошибка авторизации (невалидный токен/сертификат).
-
   /alerts/critical:
     get:
       summary: Получение списка критических инцидентов
       description: Используется WMS-системой для получения алармов (вскрытие, пожар).
       responses:
         '200':
+          description: Список активных инцидентов
           content:
             application/json:
               schema:
@@ -28,6 +19,25 @@ paths:
                 items:
                   type: object
                   properties:
-                    id: {type: string}
-                    type: {type: string, example: "unauthorized_access"}
-                    timestamp: {type: string, format: date-time}
+                    id: 
+                      type: string
+                      example: "uuid-789-123"
+                    type: 
+                      type: string
+                      example: "unauthorized_access"
+                    timestamp: 
+                      type: string
+                      format: date-time
+                      example: "2023-10-27T10:00:00Z"
+                    severity:
+                      type: string
+                      enum: [low, medium, high, critical]
+        '403':
+          description: Доступ запрещен (ошибка сетевого доступа/СЗИ)
+
+  /sensors/status:
+    get:
+      summary: Проверка состояния датчиков
+      responses:
+        '200':
+          description: Статус всех устройств в сети
